@@ -1,0 +1,24 @@
+{
+  "name": "notion-workspace",
+  "version": "0.1.0",
+  "description": "Claude files notes, leads and project ideas into its own Notion workspace, and learns your note style from your edits",
+  "author": { "name": "jctaylor11" },
+  "repository": "https://github.com/jctaylor11/notion-with-claude",
+  "license": "MIT",
+  "userConfig": {
+    "notion_read_token": {
+      "type": "string",
+      "title": "Notion read token",
+      "description": "Integration token that can read your whole workspace",
+      "sensitive": true,
+      "required": true
+    },
+    "notion_write_token": {
+      "type": "string",
+      "title": "Notion write token",
+      "description": "Integration token shared only with Claude's own workspace page",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}

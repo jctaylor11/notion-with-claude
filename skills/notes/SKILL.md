@@ -1,0 +1,185 @@
+---
+name: notes
+description: File things into Claude's own Agent Workspace in Notion and keep it organised. Covers notes on a YouTube video, podcast, article, paper or course, a recap of a discussion, research, a list, a project idea, a lead to look into later, or a learning the user wants kept in their own words. Use whenever the user sends a link to make notes on, asks to save, note or put something in Notion (including "save this project idea" and "add X to explore"), mentions something they want to look into later, or asks what they know about a topic or project from their notes.
+---
+
+# Notion workspace
+
+Agent Workspace is Claude's own space in the user's Notion. Everything Claude writes to Notion goes here and stays here. Never suggest moving it into the user's own pages. Write only with `notion-write` tools. `notion-read` is for reading the rest of their Notion, and only when asked.
+
+## Layout
+
+| What | ID |
+|---|---|
+| Agent Workspace page | `<agent-workspace-page-id>` |
+| Library data source | `<library-data-source-id>` |
+| Topics data source | `<topics-data-source-id>` |
+| Projects data source | `<projects-data-source-id>` |
+| To explore data source | `<to-explore-data-source-id>` |
+| Learnings data source (database `<learnings-database-id>`) | `<learnings-data-source-id>` |
+| User's Notion user id (to spot their edits) | `<user-id>` |
+
+**Library** (one row per item):
+- Name: the source's own title, e.g. "The New Code — Sean Grove". No "Notes:" prefix.
+- Type: Video, Podcast, Article, Paper, Course, Discussion, Research, List or Other.
+- Topics: relation to Topics.
+- Projects: relation to Projects.
+- Lead: relation to To explore, for the lead this item came from, if any.
+- Takeaway: one sentence.
+- Status: Notes ready (Claude wrote it), Reviewed (the user has finished editing) or Done (Claude has learned from the edits).
+- Source: url.
+- By: "Speaker (Org) · Channel/Publication".
+- Published: date.
+- Added: set automatically.
+
+**Topics** (one page per subject):
+- Name.
+- Summary: one line.
+- Library: relation, synced automatically.
+- To explore: relation, synced automatically. These are the leads on this subject.
+- Updated: set automatically.
+- Page body: `## Where I've got to` (a synthesis across sources) and `## Open questions`.
+
+**Projects** (one page per thing being built or that might be built, from a passing idea to a shipped product):
+- Name: short and recognisable, e.g. "Notion note-taker".
+- Pitch: one sentence saying what it is and who it's for.
+- Stage: Idea, Exploring, Active, Paused, Shipped or Dropped.
+- Next step: one concrete action.
+- Library: relation, synced automatically. It links the discussions and notes that bear on the project.
+- Updated and Added: set automatically.
+- Page body: `## The idea`, `## Working docs` (once there are any), `## Decisions so far` and `## Open questions`.
+
+**To explore** (one row per lead: something that caught the user's eye but isn't worth a deep dive yet):
+- Name: what it's called, e.g. "Tracer bullets" or "The Design of Design — Fred Brooks".
+- Kind: Concept, Book, Article, Video, Tool or Other.
+- What it is: one factual line, enough to remember why it caught their eye. Include the user's own reason if they gave one.
+- Context: one brief line on where the user came across it, in their words, e.g. "Mentioned in the Matt Pocock video about AI coding workflow". Fill it whenever they say where it came from.
+- Link: the primary source, if there is one and you've confirmed it.
+- Status: New, Done or Dropped.
+- Topics: relation, for subjects it directly bears on.
+- Library: relation, synced automatically. These are the notes made once it's explored.
+- Added: set automatically.
+- No page body is needed.
+
+**Learnings** (one row per discrete thing the user has understood, in their own words; not to be confused with the user's own "Learnings" database elsewhere in their Notion, which is read-only for me):
+- Name: a short noun phrase in the user's own terms, 2–4 words, like "MCP servers" or "Client vs conn".
+- Kind: Learning (the user's own conclusion, which they worked out) or Insight (something from a source that struck them, e.g. a speaker's idea). Always set it.
+- Library: relation to the Library row for the resource the user was going through, synced back as "Learnings". Set it whenever they say what they were watching or reading and it's already in the Library.
+- Insight: the learning or insight, in the user's own words (see "Saving a learning").
+- Context: one factual line on what prompted it, e.g. "While reading the notion-mcp-server codebase".
+- Origin: Discussion with Claude, Reading, Building, Video or Other. Set from fact, never guessed.
+- Tags: 1–3 short subject tags. Reuse a tag already in the database when it fits, and add a new one whenever none describes the learning well. Don't force the user's other databases' tags onto it.
+- Confidence: Shaky or Solid. Leave empty; only the user knows how sure they are.
+- Topics, Projects: relations, only when one clearly fits. Both sync back automatically as "Learnings".
+- Added: set automatically.
+- Page body: the user's original message, verbatim, in a toggle (Learnings only; Insights have no body).
+
+Topics are subjects being learned about, and Projects are things being made. A Library row can link to both.
+
+Where project material goes:
+- **The project page** holds only the overview: pitch, decisions, open questions and next step.
+- **Working documents** (plans, checklists, research, draft specs) are sub-pages of the project page. List them under `## Working docs`, straight after the idea, most-used first. A new sub-page is added at the bottom of the page, so move it up.
+- **Records** (notes on a source, saved discussions) are Library rows linked to the project.
+- **Once the project has a code repo**, its specs, plans and task lists live in the repo as Markdown, and the project page links to them. Don't keep copies in both places.
+
+The top level holds only the five databases. Don't create loose pages. Anything that doesn't fit becomes a Library row with Type "Other". If a new kind of item keeps turning up, add a Type option with `update-a-data-source` rather than a new database.
+
+Anything to read, watch or look into later goes in To explore, one row each. Don't make an empty Library row for something not yet read. A curated, ordered study plan (like the spec-driven development watch list) is different: it stays a List row in the Library.
+
+## Filing an item
+
+0. **Learn from reviewed notes first.** See "Learning the user's style" below.
+1. **Get the full source.**
+   - YouTube: `~/.claude/skills/notion-workspace/.venv/bin/python -I ~/.claude/skills/notion-workspace/scripts/fetch_youtube.py <url> <scratchpad>/transcripts`. It prints the metadata and the transcript path. Read the whole transcript, in chunks if it's long.
+   - Article, paper or web page: WebFetch, or the pdf skill for PDFs.
+   - Discussion: the current conversation. Recap the decisions, the reasoning and the open questions, not the back-and-forth.
+   - If you can't get the full content (no transcript, a paywall), tell the user. Never write notes from a title or blurb.
+2. **Check for duplicates.** Query Library with `{"property": "Source", "url": {"equals": "<url>"}}`. If a row already exists, ask before overwriting it.
+3. **Pick the topics.** Query all Topics (there are few).
+   - Reuse a topic when the item is mostly about it. Use 1–2 topics per item, 3 at most.
+   - Create a new topic only when nothing fits and the subject will likely come up again. Name it as a broad subject ("Evals", not "Hamel's eval talk").
+   - If two topics overlap, merge them: move the relations, archive the weaker topic, and tell the user.
+   - Also query Projects. Link the item to any project it bears on directly. Skip projects it only loosely relates to.
+4. **Create the row.** Use `post-page` with parent `{"type": "data_source_id", "data_source_id": "<Library>"}`, every property filled in, Status "Notes ready" and an emoji icon. Then write the body with `update-page-markdown` (`replace_content`, Notion-flavoured Markdown) following `style.md`.
+5. **Save the draft.** Write the exact Markdown you sent to `~/.claude/skills/notion-workspace/drafts/<page-id>.md`.
+6. **Update each linked topic page.** Read it, then fold the item's key ideas into "Where I've got to".
+   - Merge with existing points rather than appending. Keep 3–10 bullets, each ending with a link to its source row(s).
+   - Add new open questions, and remove any this item answers.
+   - Update Summary if the overall picture changed.
+7. **Link it from lists.** If the item appears on a List row (e.g. a watch list), add `→ [Notes](<row url>)` after its entry.
+8. **Reply briefly.** Give the row link, its topics, and one line on what changed on the topic pages. The notes themselves belong in Notion, not in chat. If any of the Resources look worth following up, name them and offer to add them to To explore. Don't add them automatically.
+
+## Saving a project idea
+
+1. Query Projects first. If the idea extends an existing project, update that page instead of creating a new one.
+2. Otherwise create a page with Stage "Idea", a Pitch, a Next step, and a body following the Projects template. Keep the user's own words and reasoning; don't inflate a passing idea into a plan.
+of a discussion worth keeping, save that discussion to the Library too, and link the two.
+4. When the user says a project has moved on (started, paused, shipped, dropped), update Stage and Next step, and add the decision to "Decisions so far".
+
+## Adding a lead
+
+1. Query To explore by name first. If it's already there, say so rather than adding it twice.
+2. Identify it properly. If the name is ambiguous or misremembered, find the likely match, use its correct name, and tell the user which one you assumed. Verify the facts and the link with a quick search rather than writing from memory.
+3. Create the row with Status "New", plus Kind, What it is, Link and Topics where they apply.
+4. A lead stays New until it's done. When it's written up, file the notes as usual with the Library row's Lead set to it, then set the lead to Done. If the user loses interest, set it to Dropped rather than deleting it.
+5. When the user asks to go through their leads, list the New ones, oldest first, with their one-liners.
+
+## Saving a learning
+
+Trigger: the user says to add or save a learning, or points at something they just explained and wants it kept. The point of the database is a faithful record of the user's own understanding, so the row must read as if they wrote it.
+
+**Approval first (applies to every write to Learnings, learnings and insights alike).** Before calling any `notion-write` tool for the Learnings database, show the user the core insight text I propose to save, and nothing else (no title, tags or other properties). Wait for their approval. Do the duplicate check and all other preparation first, but make no create or update call until they say yes. If they edit the wording, show the revised text again only if the change was substantial. If `notion-write` is unavailable, still show the draft and say it can't be saved yet. Approval for one batch doesn't carry over to later ones.
+
+1. **Take their words, from the message or messages they point to.** Not mine. If they restated something I said, use only their restatement.
+2. **Tidy, never rewrite.** Allowed: reorder, trim conversational filler, questions addressed to me, and repetition; join into a few short paragraphs; fix typos; end on their own closing rule if they stated one. Keep their phrasing, analogies, examples and first-person voice. Not allowed: adding facts, my corrections or explanations, or terms they didn't use.
+3. **If their version is imprecise or wrong, keep it as they said it** and tell them in chat what I think is off, so they decide whether to change it. Never silently fix it.
+4. **Name** it with a short noun phrase in their terms. **Context** is one factual line. Set **Origin** and **Tags** yourself, leave **Confidence** empty, and never ask the user to choose any metadata.
+5. **Check for duplicates.** Query Learnings by Name. If something similar exists, say so and ask whether to add to it or make a new row.
+6. **Create the row** with `post-page` (parent: the Learnings data source), Insight set, and a 💡 icon. Then write the page body with `update-page-markdown`: a toggle titled "Original message" containing the user's text verbatim.
+7. **Link** to a Topic or Project only if one clearly fits. Don't create topics for a learning, and don't edit topic pages.
+8. **Reply briefly:** the row link, and one line on what was trimmed or reordered. Include any imprecision from step 3.
+9. If the user later edits the Insight, treat the change as direct style feedback and add it to `style.md`.
+
+**Teaching beyond their words.** When the user asks for the accurate, fuller explanation to be kept with a learning, put it in the page body *after* the "Original message" toggle, under the heading `## Going deeper (written by Claude, not in the author's words)`. The Insight property and the toggle stay purely theirs; only this section may contain my words. It should: say what was checked and when, separate what holds up from what needs correcting, and list anything still unconfirmed. Only include what I've verified in the source (e.g. the code), and mark the rest as unconfirmed. Don't add it unprompted. If the topic deserves a standing synthesis across sources, that belongs on the Topic page instead.
+
+### Saving an insight
+
+Trigger: the user shares something from a source that struck them ("X says that...", "I found it insightful that..."). It uses the same table and the same faithfulness rules as a learning, with these differences:
+- **Kind** is Insight. Name is a short noun phrase. Insight is their own words, tidied, and can be one line or a short paragraph; keep the attribution they gave ("In Matt Pocock's talk, he says...").
+- **Library link is the point.** Find the resource in Library (search by name or speaker). If it's there, link it and set Origin to match (Video, Reading...). If it isn't, don't create an empty Library row: say so and offer to add it to To explore.
+- No toggle or page body. Skip Context unless there's something beyond the source itself.
+- Duplicate check, tags, empty Confidence and the short reply work as for a learning.
+- If the user's own conclusion is in the message (a Learning, not just a captured idea), use Kind Learning; if a message has both, make two rows.
+- Learnings should also get the Library link when the user names the resource they were going through.
+
+## Answering "what do I know about X"
+
+Read the topic or project page first. Open linked Library rows only when you need detail, and cite them.
+
+## Learning the user's style
+
+Status is the queue. A note stays Notes ready until the user has finished editing it and sets it to Reviewed. At the start of each filing, or whenever the user asks you to learn from their edits:
+1. Query Library for Status = Reviewed. Only these need processing. Never revisit Done rows.
+2. For each row, read the page's current Markdown and compare it with `drafts/<page-id>.md`.
+3. Add each meaningful change to `style.md` under "Learned from edits", as one line stating the rule it implies. Ignore whitespace and empty blocks. If nothing changed, the note was fine as written, so add nothing.
+4. Set the row's Status to Done and delete the draft. If a Reviewed row has no draft, just set it to Done.
+
+If the user gives style feedback directly, add it to `style.md` too. `style.md` overrides the defaults.
+
+## Keeping Agent Workspace tidy
+
+Looking after the whole workspace is part of every task that touches its structure, even when the task is narrower ("add a database", "add a property"). Don't stop at the thing that was asked for. After creating or changing a database, property or view, and before replying:
+
+1. **Read the Agent Workspace page** (`<agent-workspace-page-id>`) and look at it as the user would.
+2. **Place it.** A new database sits with the other databases at the top, in the order the page's intro describes (lead → notes → what's learned → own learnings → what's built). New blocks are added at the bottom, so move it. Do this with `update-page-markdown` `replace_content`, keeping every existing `<database>` tag in the new order. Never set `allow_deleting_content`: if the call would delete something, stop. Afterwards, read the page back and confirm all databases are still there.
+3. **Update the page's text.** Add the new thing to the intro flow, to "How it's organised" and to "Ask Claude", so the page still describes what's actually there.
+4. **Update this skill.** Add its data source ID to the Layout table, describe it, and say how to file into it.
+5. **Check for loose ends.** No stray pages, empty blocks or duplicate-named items. If something is unclear, such as where in the flow a new database belongs, choose sensibly, then tell the user what you chose and why.
+
+Then, in the reply, say what you did to the layout, not just the thing that was asked for.
+
+## Housekeeping
+
+- If the venv is missing, recreate it: `python3 -m venv .venv && .venv/bin/pip install youtube-transcript-api yt-dlp` inside this skill folder.
+- The `notion-write` MCP can't create or update databases or views. Normal filing never needs to. If a structural change is truly needed, **ask the user first**. Only once they agree, call the API directly with the `notion-write` token from `~/.claude.json`, and never print the token. Use `POST /v1/databases` (`Notion-Version: 2025-09-03`) for databases and `POST /v1/views` (`Notion-Version: 2026-03-11`) for views.
+- Existing views: To explore has "To review" (New only, oldest first) and "By status" (a board). Projects has "By stage" (a board grouped by Stage). Library has "Discussions" and "Videos & talks". Topics has "Recently updated". Learnings has "Learnings" (Kind = Learning) and "Insights" (Kind = Insight), plus the default view with both.

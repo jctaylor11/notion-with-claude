@@ -1,0 +1,43 @@
+{
+  "databases": [
+    {
+      "key": "library",
+      "title": "Library",
+      "icon": "📚",
+      "description": "Everything Claude has written up: notes on videos, podcasts, articles and papers, recaps of discussions, research and lists. One row per item, tagged with Topics.",
+      "properties": {
+        "Name": { "title": {} },
+        "Type": {
+          "select": {
+            "options": [
+              { "name": "Video", "color": "red" },
+              { "name": "Podcast", "color": "purple" },
+              { "name": "Article", "color": "blue" },
+              { "name": "Paper", "color": "brown" },
+              { "name": "Course", "color": "orange" },
+              { "name": "Discussion", "color": "green" },
+              { "name": "Research", "color": "yellow" },
+              { "name": "List", "color": "pink" },
+              { "name": "Other", "color": "gray" }
+            ]
+          }
+        },
+        "Takeaway": { "rich_text": {} },
+        "Status": {
+          "select": {
+            "options": [
+              { "name": "Notes ready", "color": "blue" },
+              { "name": "Reviewed", "color": "orange" },
+              { "name": "Done", "color": "green" }
+            ]
+          }
+        },
+        "Source": { "url": {} },
+        "By": { "rich_text": {} },
+        "Published": { "date": {} },
+        "Added": { "created_time": {} }
+      },
+      "relations": []
+    }
+  ]
+}

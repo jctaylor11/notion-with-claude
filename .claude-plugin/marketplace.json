@@ -1,0 +1,11 @@
+{
+  "name": "jctaylor11",
+  "owner": { "name": "jctaylor11" },
+  "plugins": [
+    {
+      "name": "notion-workspace",
+      "source": "./",
+      "description": "Claude files notes, leads and project ideas into its own Notion workspace"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "notion-read-test": {
+      "command": "${HOME}/test-notion-mcp/node_modules/.bin/notion-mcp-server",
+      "env": { "NOTION_TOKEN": "${user_config.notion_read_token}" }
+    },
+    "notion-write-test": {
+      "command": "${HOME}/test-notion-mcp/node_modules/.bin/notion-mcp-server",
+      "env": { "NOTION_TOKEN": "${user_config.notion_write_token}" }
+    }
+  }
+}
