@@ -1,0 +1,23 @@
+{
+  "views": [
+    { "database": "explore", "name": "To review", "type": "table",
+      "filter": { "property": "Status", "select": { "equals": "New" } },
+      "sorts": [{ "property": "Added", "direction": "ascending" }] },
+    { "database": "explore", "name": "By status", "type": "board", "group_by": "Status" },
+    { "database": "library", "name": "Videos & talks", "type": "table",
+      "filter": { "property": "Type", "select": { "equals": "Video" } },
+      "sorts": [{ "property": "Added", "direction": "descending" }] },
+    { "database": "library", "name": "Discussions", "type": "table",
+      "filter": { "property": "Type", "select": { "equals": "Discussion" } },
+      "sorts": [{ "property": "Added", "direction": "descending" }] },
+    { "database": "topics", "name": "Recently updated", "type": "table",
+      "sorts": [{ "property": "Updated", "direction": "descending" }] },
+    { "database": "learnings", "name": "Learnings", "type": "table",
+      "filter": { "property": "Kind", "select": { "equals": "Learning" } },
+      "sorts": [{ "property": "Added", "direction": "descending" }] },
+    { "database": "learnings", "name": "Insights", "type": "table",
+      "filter": { "property": "Kind", "select": { "equals": "Insight" } },
+      "sorts": [{ "property": "Added", "direction": "descending" }] },
+    { "database": "projects", "name": "By stage", "type": "board", "group_by": "Stage" }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "notion-workspace",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Claude files notes, leads and project ideas into its own Notion workspace, and learns your note style from your edits",
   "author": { "name": "jctaylor11" },
   "repository": "https://github.com/jctaylor11/notion-with-claude",

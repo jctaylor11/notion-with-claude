@@ -1,5 +1,40 @@
 {
+  "schema_version": 1,
   "databases": [
+    {
+      "key": "explore",
+      "title": "To explore",
+      "icon": "🔭",
+      "description": "Leads: ideas, books, articles and tools that caught your eye but aren't worth a deep dive yet. One row each, reviewed now and then, then explored or dropped.",
+      "properties": {
+        "Name": { "title": {} },
+        "Kind": {
+          "select": {
+            "options": [
+              { "name": "Concept", "color": "purple" },
+              { "name": "Book", "color": "brown" },
+              { "name": "Article", "color": "blue" },
+              { "name": "Video", "color": "red" },
+              { "name": "Tool", "color": "green" },
+              { "name": "Other", "color": "gray" }
+            ]
+          }
+        },
+        "Status": {
+          "select": {
+            "options": [
+              { "name": "New", "color": "gray" },
+              { "name": "Done", "color": "green" },
+              { "name": "Dropped", "color": "red" }
+            ]
+          }
+        },
+        "What it is": { "rich_text": {} },
+        "Context": { "rich_text": {} },
+        "Link": { "url": {} },
+        "Added": { "created_time": {} }
+      }
+    },
     {
       "key": "library",
       "title": "Library",
@@ -36,8 +71,80 @@
         "By": { "rich_text": {} },
         "Published": { "date": {} },
         "Added": { "created_time": {} }
-      },
-      "relations": []
+      }
+    },
+    {
+      "key": "topics",
+      "title": "Topics",
+      "icon": "🧭",
+      "description": "One page per subject. Each holds a running synthesis of everything in the Library on that subject, and links to its sources.",
+      "properties": {
+        "Name": { "title": {} },
+        "Summary": { "rich_text": {} },
+        "Updated": { "last_edited_time": {} }
+      }
+    },
+    {
+      "key": "learnings",
+      "title": "Learnings",
+      "icon": "💡",
+      "description": "Things you've understood, in your own words. One learning per row.",
+      "properties": {
+        "Name": { "title": {} },
+        "Kind": {
+          "select": {
+            "options": [
+              { "name": "Learning", "color": "blue" },
+              { "name": "Insight", "color": "yellow" }
+            ]
+          }
+        },
+        "Insight": { "rich_text": {} },
+        "Context": { "rich_text": {} },
+        "Origin": {
+          "select": {
+            "options": [
+              { "name": "Discussion with Claude", "color": "blue" },
+              { "name": "Reading", "color": "green" },
+              { "name": "Building", "color": "orange" },
+              { "name": "Video", "color": "red" },
+              { "name": "Other", "color": "gray" }
+            ]
+          }
+        },
+        "Tags": { "multi_select": { "options": [] } },
+        "Added": { "created_time": {} }
+      }
+    },
+    {
+      "key": "projects",
+      "title": "Projects",
+      "icon": "🛠️",
+      "description": "Things being built or that might be built: one page per project or idea, with its stage, next step, and the Library items that relate to it.",
+      "properties": {
+        "Name": { "title": {} },
+        "Pitch": { "rich_text": {} },
+        "Stage": {
+          "select": {
+            "options": [
+              { "name": "Inactive", "color": "pink" },
+              { "name": "Active", "color": "blue" },
+              { "name": "Shipped", "color": "green" }
+            ]
+          }
+        },
+        "Added": { "created_time": {} },
+        "Updated": { "last_edited_time": {} }
+      }
     }
+  ],
+  "relations": [
+    { "from": "library", "property": "Topics", "to": "topics", "synced_property": "Library" },
+    { "from": "library", "property": "Projects", "to": "projects", "synced_property": "Library" },
+    { "from": "library", "property": "Lead", "to": "explore", "synced_property": "Library" },
+    { "from": "library", "property": "Learnings", "to": "learnings", "synced_property": "Library" },
+    { "from": "topics", "property": "To explore", "to": "explore", "synced_property": "Topics" },
+    { "from": "topics", "property": "Learnings", "to": "learnings", "synced_property": "Topics" },
+    { "from": "projects", "property": "Learnings", "to": "learnings", "synced_property": "Projects" }
   ]
 }
