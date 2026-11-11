@@ -1,6 +1,6 @@
 # Note style
 
-These are the defaults for Library pages. Rules under "Learned from edits" come from the user's own edits and override the defaults.
+These are the defaults for Library pages. Rules in `learned-style.md` (in the plugin data folder) come from the user's own edits and override them.
 
 ## General
 
@@ -31,7 +31,3 @@ Same as videos, but without timestamps. Name the section of the source in bracke
 - `## Decisions`: what was settled, with the reason for each.
 - `## Reasoning`: the key arguments and trade-offs, including rejected options in one line each.
 - `## Open questions / next steps`
-
-## Learned from edits
-
-(none yet)

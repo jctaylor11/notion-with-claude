@@ -27,7 +27,7 @@ Read `${CLAUDE_PLUGIN_DATA}/config.json`. If it's missing, start from an empty o
 For each database in the schema, in order:
 
 1. List the workspace page's children (`get-block-children`) and look for a `child_database` with the same title. If one exists, record its IDs in the config as already there, and move on without changing it.
-2. Otherwise call `create-database` with the workspace page as parent, the schema's `title`, `icon` and `description`, and its `properties` as `initial_data_source.properties`.
+2. Otherwise call `create-database` with the workspace page as parent, the schema's `title`, `icon` and `description`, and its `properties` as `initial_data_source.properties`. The schema stores `icon` as a bare emoji string; send it wrapped as `{"type": "emoji", "emoji": "<the string>"}`, because the tool rejects a plain string.
 3. Take `database_id` and `data_source_id` from the response and write both to `config.json` straight away, so a failed run resumes where it stopped.
 
 Config shape:
