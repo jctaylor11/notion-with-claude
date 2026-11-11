@@ -1,6 +1,6 @@
 ---
 name: notes
-description: File things into Claude's own workspace in Notion and keep it organised. Covers notes on a YouTube video, podcast, article, paper or course, a recap of a discussion, research, a list, a project idea, a lead to look into later, or a learning the user wants kept in their own words. Use whenever the user sends a link to make notes on, asks to save, note or put something in Notion (including "save this project idea" and "add X to explore"), mentions something they want to look into later, or asks what they know about a topic or project from their notes.
+description: File things into Claude's own workspace in Notion and keep it organised. Covers notes on a YouTube video, podcast, article, paper or course, a recap of a discussion, research, a list, a project idea or a lead to look into later. Use whenever the user sends a link to make notes on, asks to save, note or put something in Notion (including "save this project idea" and "add X to explore"), mentions something they want to look into later, or asks what they know about a topic or project from their notes.
 ---
 
 # Notion workspace
@@ -56,19 +56,6 @@ Everything else that changes lives in the same folder: `learned-style.md` (rules
 - Added: set automatically.
 - No page body is needed.
 
-**Learnings** (one row per discrete thing the user has understood, in their own words; not to be confused with the user's own "Learnings" database elsewhere in their Notion, which is read-only for me):
-- Name: a short noun phrase in the user's own terms, 2–4 words, like "MCP servers" or "Client vs conn".
-- Kind: Learning (the user's own conclusion, which they worked out) or Insight (something from a source that struck them, e.g. a speaker's idea). Always set it.
-- Library: relation to the Library row for the resource the user was going through, synced back as "Learnings". Set it whenever they say what they were watching or reading and it's already in the Library.
-- Insight: the learning or insight, in the user's own words (see "Saving a learning").
-- Context: one factual line on what prompted it, e.g. "While reading the notion-mcp-server codebase".
-- Origin: Discussion with Claude, Reading, Building, Video or Other. Set from fact, never guessed.
-- Tags: 1–3 short subject tags. Reuse a tag already in the database when it fits, and add a new one whenever none describes the learning well. Don't force the user's other databases' tags onto it.
-- Confidence: Shaky or Solid. Leave empty; only the user knows how sure they are.
-- Topics, Projects: relations, only when one clearly fits. Both sync back automatically as "Learnings".
-- Added: set automatically.
-- Page body: the user's original message, verbatim, in a toggle (Learnings only; Insights have no body).
-
 Topics are subjects being learned about, and Projects are things being made. A Library row can link to both.
 
 Where project material goes:
@@ -118,34 +105,6 @@ Anything to read, watch or look into later goes in To explore, one row each. Don
 3. Create the row with Status "New", plus Kind, What it is, Link and Topics where they apply.
 4. A lead stays New until it's done. When it's written up, file the notes as usual with the Library row's Lead set to it, then set the lead to Done. If the user loses interest, set it to Dropped rather than deleting it.
 5. When the user asks to go through their leads, list the New ones, oldest first, with their one-liners.
-
-## Saving a learning
-
-Trigger: the user says to add or save a learning, or points at something they just explained and wants it kept. The point of the database is a faithful record of the user's own understanding, so the row must read as if they wrote it.
-
-**Approval first (applies to every write to Learnings, learnings and insights alike).** Before calling any `notion-write` tool for the Learnings database, show the user the core insight text I propose to save, and nothing else (no title, tags or other properties). Wait for their approval. Do the duplicate check and all other preparation first, but make no create or update call until they say yes. If they edit the wording, show the revised text again only if the change was substantial. If `notion-write` is unavailable, still show the draft and say it can't be saved yet. Approval for one batch doesn't carry over to later ones.
-
-1. **Take their words, from the message or messages they point to.** Not mine. If they restated something I said, use only their restatement.
-2. **Tidy, never rewrite.** Allowed: reorder, trim conversational filler, questions addressed to me, and repetition; join into a few short paragraphs; fix typos; end on their own closing rule if they stated one. Keep their phrasing, analogies, examples and first-person voice. Not allowed: adding facts, my corrections or explanations, or terms they didn't use.
-3. **If their version is imprecise or wrong, keep it as they said it** and tell them in chat what I think is off, so they decide whether to change it. Never silently fix it.
-4. **Name** it with a short noun phrase in their terms. **Context** is one factual line. Set **Origin** and **Tags** yourself, leave **Confidence** empty, and never ask the user to choose any metadata.
-5. **Check for duplicates.** Query Learnings by Name. If something similar exists, say so and ask whether to add to it or make a new row.
-6. **Create the row** with `post-page` (parent: the Learnings data source), Insight set, and a 💡 icon. Then write the page body with `update-page-markdown`: a toggle titled "Original message" containing the user's text verbatim.
-7. **Link** to a Topic or Project only if one clearly fits. Don't create topics for a learning, and don't edit topic pages.
-8. **Reply briefly:** the row link, and one line on what was trimmed or reordered. Include any imprecision from step 3.
-9. If the user later edits the Insight, treat the change as direct style feedback and add it to `learned-style.md`.
-
-**Teaching beyond their words.** When the user asks for the accurate, fuller explanation to be kept with a learning, put it in the page body *after* the "Original message" toggle, under the heading `## Going deeper (written by Claude, not in the author's words)`. The Insight property and the toggle stay purely theirs; only this section may contain my words. It should: say what was checked and when, separate what holds up from what needs correcting, and list anything still unconfirmed. Only include what I've verified in the source (e.g. the code), and mark the rest as unconfirmed. Don't add it unprompted. If the topic deserves a standing synthesis across sources, that belongs on the Topic page instead.
-
-### Saving an insight
-
-Trigger: the user shares something from a source that struck them ("X says that...", "I found it insightful that..."). It uses the same table and the same faithfulness rules as a learning, with these differences:
-- **Kind** is Insight. Name is a short noun phrase. Insight is their own words, tidied, and can be one line or a short paragraph; keep the attribution they gave ("In Matt Pocock's talk, he says...").
-- **Library link is the point.** Find the resource in Library (search by name or speaker). If it's there, link it and set Origin to match (Video, Reading...). If it isn't, don't create an empty Library row: say so and offer to add it to To explore.
-- No toggle or page body. Skip Context unless there's something beyond the source itself.
-- Duplicate check, tags, empty Confidence and the short reply work as for a learning.
-- If the user's own conclusion is in the message (a Learning, not just a captured idea), use Kind Learning; if a message has both, make two rows.
-- Learnings should also get the Library link when the user names the resource they were going through.
 
 ## Answering "what do I know about X"
 
